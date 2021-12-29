@@ -3,11 +3,12 @@ import fragment from "./shader/fragment.glsl";
 import vertex from "./shader/vertex.glsl";
 import dat from "../node_modules/three/examples/jsm/libs/dat.gui.module";
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls";
-
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import uncle_jerry from './uncle_jerry.glb'
 export default class Sketch {
   constructor(options) {
     this.scene = new THREE.Scene();
-
+    this.gltfLoader = new GLTFLoader();
     this.container = options.dom;
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
@@ -65,6 +66,27 @@ export default class Sketch {
 
   addObjects() {
     let that = this; //eslint-disable-line
+    this.gltfLoader.load(
+      uncle_jerry,
+      (gltf) =>
+      {
+          console.log('success')
+          console.log(gltf)
+          this.scene.add(gltf.scene);
+      },
+      (progress) =>
+      {
+          console.log('progress')
+          console.log(progress)
+      },
+      (error) =>
+      {
+          console.log('error')
+          console.log(error)
+      }
+  )
+    this.light = new THREE.HemisphereLight(0xffffff, 0x444444);
+    this.scene.add(this.light)
     this.material = new THREE.ShaderMaterial({
       extensions: {
         derivatives: "#extension GL_OES_standard_derivatives : enable",
@@ -86,7 +108,7 @@ export default class Sketch {
     this.geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
 
     this.plane = new THREE.Mesh(this.geometry, this.material);
-    this.scene.add(this.plane);
+    // this.scene.add(this.plane);
   }
 
   stop() {
